@@ -28,11 +28,12 @@ end
 
 every(3.seconds) do
   STATE.keys.each do |port|
+    next if port == PORT
     puts "Fetching update from #{port.to_s.green}"
     begin
       gossip_response = Client.gossip(port, JSON.dump(STATE))
-      update_state(JSON.load(gossip_response), port: port)
-    rescue Faraday::ConnectionError => e
+      update_state(JSON.load(gossip_response))
+    rescue Faraday::ConnectionFailed => e
       STATE.delete(port)
     end
   end
